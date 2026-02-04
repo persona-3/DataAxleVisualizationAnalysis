@@ -173,11 +173,21 @@ def create_demographic_analysis(df, suffix=""):
         axes[0,0].pie(gender_counts.values, labels=gender_counts.index, autopct='%1.1f%%')
         axes[0,0].set_title('Gender Distribution')
     
-    # Marital status
+    # Marital status: DB has only 'married', 'single', or null
     if 'data.document.attributes.estimated_married' in df.columns:
-        married_counts = df['data.document.attributes.estimated_married'].value_counts()
-        axes[0,1].pie(married_counts.values, labels=['Married' if x else 'Single' for x in married_counts.index], 
-                     autopct='%1.1f%%')
+        def _married_label(x):
+            if pd.isna(x) or x is None or str(x).strip() == '':
+                return 'Not disclosed'
+            s = str(x).strip().lower()
+            if s == 'married':
+                return 'Married'
+            if s == 'single':
+                return 'Single'
+            return 'Not disclosed'
+        ser = df['data.document.attributes.estimated_married'].map(_married_label)
+        married_counts = ser.value_counts()
+        if len(married_counts) > 0:
+            axes[0,1].pie(married_counts.values, labels=married_counts.index.tolist(), autopct='%1.1f%%')
         axes[0,1].set_title('Marital Status Distribution')
     
     # Home ownership
