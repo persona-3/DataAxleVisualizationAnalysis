@@ -65,12 +65,14 @@ def load_from_postgres(
     table: str = "matched_emails",
     email_column: str = "email",
     data_column: str = "response_json",
+    store_column: str = "external_store_id",
 ) -> pd.DataFrame:
     """
     Load Data Axle match data from PostgreSQL and return a DataFrame with the same
     column names as the dashboard expects.
 
-    Expected table columns: email, response_json (JSON/JSONB with match result), created_at (optional).
+    Expected table columns: email, response_json (JSON/JSONB with match result),
+    and optionally external_store_id (or store_column) for per-store dashboards.
     """
     if psycopg2 is None:
         raise ImportError("psycopg2 is required for PostgreSQL. Install with: pip install psycopg2-binary")
@@ -85,13 +87,17 @@ def load_from_postgres(
             "PostgreSQL connection string required. Set DATABASE_URL or POSTGRES_URI, or pass connection_string=..."
         )
 
+    columns = [email_column, data_column]
+    if store_column:
+        columns.append(store_column)
+
     print(f"Connecting to PostgreSQL and reading from {table}...")
     conn = psycopg2.connect(conn_str)
     try:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute(
                 sql.SQL("SELECT {} FROM {}").format(
-                    sql.SQL(", ").join(map(sql.Identifier, [email_column, data_column])),
+                    sql.SQL(", ").join(map(sql.Identifier, columns)),
                     sql.Identifier(table),
                 ),
                 (),
@@ -109,15 +115,20 @@ def load_from_postgres(
         email = row.get(email_column)
         raw = row.get(data_column)
         if raw is None:
-            records.append({"email": email})
-            continue
-        if isinstance(raw, str):
-            try:
-                raw = json.loads(raw)
-            except json.JSONDecodeError:
-                records.append({"email": email})
-                continue
-        records.append(_row_to_flat(email, raw))
+            flat = {"email": email}
+        else:
+            if isinstance(raw, str):
+                try:
+                    raw = json.loads(raw)
+                except json.JSONDecodeError:
+                    flat = {"email": email}
+                else:
+                    flat = _row_to_flat(email, raw)
+            else:
+                flat = _row_to_flat(email, raw)
+        if store_column and store_column in row:
+            flat["external_store_id"] = row.get(store_column)
+        records.append(flat)
 
     df = pd.DataFrame(records)
     print(f"Loaded {len(df):,} records from PostgreSQL ({len(df.columns)} columns)")

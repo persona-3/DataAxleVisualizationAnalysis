@@ -92,9 +92,9 @@ def load_and_clean_data(filename='data_axle_results.csv'):
     print(f"Loaded {len(df)} records")
     return df
 
-def create_geographic_analysis(df):
+def create_geographic_analysis(df, suffix=""):
     """Create geographic distribution visualizations"""
-    print("Creating geographic analysis...")
+    print(f"Creating geographic analysis{suffix}...")
     
     fig, axes = plt.subplots(2, 2, figsize=(16, 12))
     fig.suptitle('Geographic Distribution of Users', fontsize=16, fontweight='bold')
@@ -156,12 +156,13 @@ Top 3 States:
         # axes[1,1].set_title('Geographic Summary')
     
     plt.tight_layout()
-    plt.savefig('geographic_analysis.png', dpi=300, bbox_inches='tight')
+    plt.savefig(f'geographic_analysis{suffix}.png', dpi=300, bbox_inches='tight')
+    plt.close()
     # plt.show()
 
-def create_demographic_analysis(df):
+def create_demographic_analysis(df, suffix=""):
     """Create demographic distribution visualizations"""
-    print("Creating demographic analysis...")
+    print(f"Creating demographic analysis{suffix}...")
     
     fig, axes = plt.subplots(2, 2, figsize=(18, 12))
     fig.suptitle('User Demographics Analysis', fontsize=16, fontweight='bold')
@@ -215,12 +216,13 @@ def create_demographic_analysis(df):
     #         axes[1,2].set_title('Political Affiliation')
     
     plt.tight_layout()
-    plt.savefig('demographic_analysis.png', dpi=300, bbox_inches='tight')
+    plt.savefig(f'demographic_analysis{suffix}.png', dpi=300, bbox_inches='tight')
+    plt.close()
     # plt.show()
 
-def create_financial_analysis(df):
+def create_financial_analysis(df, suffix=""):
     """Create financial/income distribution visualizations"""
-    print("Creating financial analysis...")
+    print(f"Creating financial analysis{suffix}...")
     
     fig, axes = plt.subplots(2, 2, figsize=(16, 12))
     fig.suptitle('Financial Profile of Users', fontsize=16, fontweight='bold')
@@ -342,12 +344,13 @@ Range Data: {len(wealth_midpoint):,} users"""
     axes[1,1].axis('off')
     
     plt.tight_layout()
-    plt.savefig('financial_analysis.png', dpi=300, bbox_inches='tight')
+    plt.savefig(f'financial_analysis{suffix}.png', dpi=300, bbox_inches='tight')
+    plt.close()
     # plt.show()
 
-def create_interests_analysis(df):
+def create_interests_analysis(df, suffix=""):
     """Create interests and lifestyle analysis"""
-    print("Creating interests analysis...")
+    print(f"Creating interests analysis{suffix}...")
 
     # Find interest columns
     interest_cols = [col for col in df.columns if 'interests.' in col and col not in ['data.document.attributes.interests.id', 'data.document.attributes.interests.created_at']]
@@ -489,12 +492,13 @@ def create_interests_analysis(df):
         # axes[1,2].set_title('Key Interest Insights')
     
     plt.tight_layout()
-    plt.savefig('interests_analysis.png', dpi=300, bbox_inches='tight')
+    plt.savefig(f'interests_analysis{suffix}.png', dpi=300, bbox_inches='tight')
+    plt.close()
     # plt.show()
 
-def create_summary_dashboard(df):
+def create_summary_dashboard(df, suffix=""):
     """Create a high-level summary dashboard"""
-    print("Creating summary dashboard...")
+    print(f"Creating summary dashboard{suffix}...")
     
     fig, axes = plt.subplots(2, 2, figsize=(20, 12))
     fig.suptitle('User Base Summary Dashboard', fontsize=18, fontweight='bold')
@@ -617,7 +621,8 @@ def create_summary_dashboard(df):
     # axes[1,2].axis('off')
     
     plt.tight_layout()
-    plt.savefig('summary_dashboard.png', dpi=300, bbox_inches='tight')
+    plt.savefig(f'summary_dashboard{suffix}.png', dpi=300, bbox_inches='tight')
+    plt.close()
     # plt.show()
 
 def create_business_insights_report(df):
@@ -674,9 +679,9 @@ def create_business_insights_report(df):
         for i, (interest, data) in enumerate(mass_market):
             print(f"{i+1}. {interest}: {data['users']:,} users (avg: {data['avg_score']:.1f}/9)")
 
-def generate_html_dashboard(df):
+def generate_html_dashboard(df, suffix=""):
     """Generate HTML dashboard that combines all visualizations with dynamic content"""
-    print("Generating dynamic HTML dashboard...")
+    print(f"Generating dynamic HTML dashboard{suffix}...")
     
     # Calculate key metrics from the data
     total_users = len(df)
@@ -1063,7 +1068,7 @@ def generate_html_dashboard(df):
             </div>
             <div class="section-content">
                 <div class="chart-container">
-                    <img src="summary_dashboard.png" alt="Executive Summary Dashboard">
+                    <img src="summary_dashboard{suffix}.png" alt="Executive Summary Dashboard">
                 </div>
                 <!-- <div class="insights-grid">
                     <div class="insight-card">
@@ -1105,7 +1110,7 @@ def generate_html_dashboard(df):
             </div>
             <div class="section-content">
                 <div class="chart-container">
-                    <img src="geographic_analysis.png" alt="Geographic Analysis">
+                    <img src="geographic_analysis{suffix}.png" alt="Geographic Analysis">
                 </div>
                 <!-- <div class="insights-grid">
                     <div class="insight-card">
@@ -1139,7 +1144,7 @@ def generate_html_dashboard(df):
             </div>
             <div class="section-content">
                 <div class="chart-container">
-                    <img src="demographic_analysis.png" alt="Demographic Analysis">
+                    <img src="demographic_analysis{suffix}.png" alt="Demographic Analysis">
                 </div>
                 <!-- <div class="insights-grid">
                     <div class="insight-card">
@@ -1171,7 +1176,7 @@ def generate_html_dashboard(df):
             </div>
             <div class="section-content">
                 <div class="chart-container">
-                    <img src="financial_analysis.png" alt="Financial Analysis">
+                    <img src="financial_analysis{suffix}.png" alt="Financial Analysis">
                 </div>
                 <!-- <div class="insights-grid">
                     <div class="insight-card">
@@ -1208,7 +1213,7 @@ def generate_html_dashboard(df):
             </div>
             <div class="section-content">
                 <div class="chart-container">
-                    <img src="interests_analysis.png" alt="Interest Analysis">
+                    <img src="interests_analysis{suffix}.png" alt="Interest Analysis">
                 </div>
                 
                 <!-- <div class="methodology">
@@ -1384,12 +1389,21 @@ def generate_html_dashboard(df):
 </html>'''
     
     # Write the HTML file
-    with open('user_dashboard.html', 'w', encoding='utf-8') as f:
+    html_filename = f'user_dashboard{suffix}.html'
+    with open(html_filename, 'w', encoding='utf-8') as f:
         f.write(html_content)
     
-    print("✅ Dynamic HTML dashboard generated: user_dashboard.html")
+    print(f"✅ Dynamic HTML dashboard generated: {html_filename}")
     print("📱 Open this file in any web browser to view the complete dashboard")
     print("🔄 Dashboard content reflects current data and can be regenerated anytime")
+
+def _store_id_to_suffix(store_id):
+    """Convert external_store_id to a file-safe suffix (e.g. 'Swim Outlet' -> 'SwimOutlet')."""
+    if store_id is None or (isinstance(store_id, float) and np.isnan(store_id)):
+        return ""
+    s = str(store_id).strip()
+    return "".join(c for c in s if c.isalnum() or c in " _-").replace(" ", "").replace("-", "_").replace("__", "_") or "Store"
+
 
 def main():
     """Main function to run all analyses. Data is loaded only from PostgreSQL matched_emails (no CSV)."""
@@ -1419,6 +1433,12 @@ def main():
         dest="data_col",
         help="JSON/JSONB column name (default: response_json)",
     )
+    parser.add_argument(
+        "--store-col",
+        default="external_store_id",
+        dest="store_col",
+        help="Store identifier column for per-store dashboards (default: external_store_id)",
+    )
     args = parser.parse_args()
 
     if not args.postgres:
@@ -1436,6 +1456,7 @@ def main():
         table=args.table,
         email_column=args.email_col,
         data_column=args.data_col,
+        store_column=args.store_col,
     )
     df = normalize_numeric_columns(df)
 
@@ -1443,35 +1464,56 @@ def main():
     print(f"- Total records: {len(df):,}")
     print(f"- Total columns: {len(df.columns)}")
     print(f"- Memory usage: {df.memory_usage(deep=True).sum() / 1024**2:.1f} MB")
-    
-    # Create visualizations
+
+    has_store = "external_store_id" in df.columns and df["external_store_id"].notna().any()
+    stores = []
+    if has_store:
+        stores = df["external_store_id"].dropna().unique().tolist()
+        print(f"- Stores: {len(stores)} ({', '.join(str(s) for s in stores[:10])}{'...' if len(stores) > 10 else ''})")
+
+    def run_dashboards(data, suffix, label):
+        create_summary_dashboard(data, suffix=suffix)
+        create_geographic_analysis(data, suffix=suffix)
+        create_demographic_analysis(data, suffix=suffix)
+        create_financial_analysis(data, suffix=suffix)
+        create_interests_analysis(data, suffix=suffix)
+        generate_html_dashboard(data, suffix=suffix)
+
     try:
-        create_summary_dashboard(df)
-        create_geographic_analysis(df)
-        create_demographic_analysis(df)
-        create_financial_analysis(df)
-        create_interests_analysis(df)
+        # 1) Combined dashboard (all stores)
+        print("\n--- All stores (combined) ---")
+        run_dashboards(df, "", "all stores")
         create_business_insights_report(df)
-        generate_html_dashboard(df)
-        
+
+        # 2) Per-store dashboards
+        if has_store and stores:
+            for store_id in stores:
+                file_suffix = _store_id_to_suffix(store_id)
+                if not file_suffix:
+                    continue
+                suffix = "_" + file_suffix
+                df_store = df[df["external_store_id"] == store_id]
+                if len(df_store) == 0:
+                    continue
+                print(f"\n--- Store: {store_id} ({len(df_store):,} records) ---")
+                run_dashboards(df_store, suffix, str(store_id))
+
         print("\n✅ Analysis complete! Generated files:")
-        print("📊 Individual Visualizations:")
-        print("  - summary_dashboard.png: High-level business overview")
-        print("  - geographic_analysis.png: User geographic distribution")  
-        print("  - demographic_analysis.png: Age, gender, education demographics")
-        print("  - financial_analysis.png: Income and wealth analysis")
-        print("  - interests_analysis.png: User interests with intensity scores (1-9)")
-        print("\n🌐 Comprehensive Dashboard:")
-        print("  - user_dashboard.html: Single-page dashboard with all insights")
-        
+        print("📊 All-stores (combined):")
+        print("  - summary_dashboard.png, geographic_analysis.png, demographic_analysis.png,")
+        print("  - financial_analysis.png, interests_analysis.png, user_dashboard.html")
+        if has_store and stores:
+            print("\n📊 Per-store dashboards:")
+            for store_id in stores:
+                suf = _store_id_to_suffix(store_id)
+                if suf:
+                    print(f"  - {store_id}: summary_dashboard_{suf}.png, ... user_dashboard_{suf}.html")
         print("\n🎯 Business insights show high-value segments and opportunities!")
-        print("📱 Share 'user_dashboard.html' with your business team for easy viewing!")
-        print("\nThese insights will help your business team understand user engagement intensity,")
-        print("not just participation, for more targeted marketing and product development!")
-        
+        print("📱 Share the HTML dashboards with your business team for easy viewing!")
     except Exception as e:
         print(f"❌ Error during analysis: {str(e)}")
         print("Please check your data file and column names.")
+        raise
 
 if __name__ == "__main__":
     main() 
